@@ -1,0 +1,49 @@
+name: Agent config check by alalanet
+description: Check the AI agent configuration a pull request carries (MCP servers, hooks, tasks, CLAUDE.md, AGENTS.md, rules) before anyone opens it in an agent.
+author: alalanet
+branding:
+  icon: shield
+  color: green
+inputs:
+  path:
+    description: The folder whose agent configuration is checked, as an agent would open it (the repository root by default).
+    required: false
+    default: "."
+  fail-on:
+    description: "Fail the step on this verdict or worse: block (default) or hold."
+    required: false
+    default: block
+  on-error:
+    description: "When alalanet cannot check (daily limit, outage): fail (default, no unchecked green) or warn."
+    required: false
+    default: fail
+  github-oidc:
+    description: "auto (default): when the workflow grants id-token: write, send a GitHub OIDC token so the check counts against this repository's own daily quota; off: never."
+    required: false
+    default: auto
+  api:
+    description: alalanet base URL.
+    required: false
+    default: https://alalanet.com
+outputs:
+  decision:
+    description: allow, hold or block (alalanet's verdict, raised to hold when the Action could not send a file).
+    value: ${{ steps.check.outputs.decision }}
+  attestation:
+    description: The id of the signed statement in alalanet's transparency log (kind 4315), when there is one.
+    value: ${{ steps.check.outputs.attestation }}
+  files-sha256:
+    description: The salted hash of the files sent, as signed.
+    value: ${{ steps.check.outputs.files-sha256 }}
+runs:
+  using: composite
+  steps:
+    - id: check
+      shell: bash
+      env:
+        INPUT_PATH: ${{ inputs.path }}
+        FAIL_ON: ${{ inputs.fail-on }}
+        ON_ERROR: ${{ inputs.on-error }}
+        OIDC: ${{ inputs.github-oidc }}
+        API: ${{ inputs.api }}
+      run: bash "$GITHUB_ACTION_PATH/check.sh"
