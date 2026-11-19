@@ -1,5 +1,5 @@
 name: Agent config check by alalanet
-description: Check the AI agent configuration a pull request carries (MCP servers, hooks, tasks, CLAUDE.md, AGENTS.md, rules) before anyone opens it in an agent.
+description: Check the AI agent configuration a pull request carries (MCP servers, hooks, CLAUDE.md, AGENTS.md) before an agent opens it.
 author: alalanet
 branding:
   icon: shield
